@@ -3,45 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ray Wong</title>
+<title>YOUR NAME</title>
 <style>
-  :root { --accent:#2563EB; --bg:#0b1020; --card:#131a2e; --text:#e6e9f2; --muted:#8a93a8; }
-  body.gen-z        { --accent:#EC4899; --bg:#120a1f; --card:#1d1233; }
-  body.quiet        { --accent:#64748b; --bg:#0f1115; --card:#171a21; }
-  body.professional { --accent:#2563EB; --bg:#f1f5f9; --card:#ffffff; --text:#0f172a; --muted:#64748b; }
-  body.martial      { --accent:#DC2626; --bg:#0a0a0a; --card:#161616; }
+  :root {
+    --accent:#2563EB; --accent-2:#0D9488;
+    --bg:#0b1020; --text:#e6e9f2; --muted:#8a93a8;
+    --card:rgba(255,255,255,.04); --border:rgba(255,255,255,.08);
+    --glow:rgba(37,99,235,.35);
+  }
+  body.gen-z        { --accent:#EC4899; --accent-2:#7C3AED; --bg:#120a1f; --glow:rgba(236,72,153,.35); }
+  body.quiet        { --accent:#64748b; --accent-2:#0891B2; --bg:#0f1115; --glow:rgba(100,116,139,.25); }
+  body.professional { --accent:#2563EB; --accent-2:#0D9488; --bg:#f1f5f9; --text:#0f172a; --muted:#64748b;
+                      --card:rgba(255,255,255,.9); --border:rgba(15,23,42,.08); --glow:rgba(37,99,235,.18); }
+  body.martial      { --accent:#DC2626; --accent-2:#EA580C; --bg:#0a0a0a; --glow:rgba(220,38,38,.35); }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); transition: all .3s; min-height: 100vh; padding: 40px 20px; }
-  .wrap { max-width: 900px; margin: auto; display: grid; gap: 24px; }
-  .card { background: var(--card); border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,.06); }
-  h1 { font-size: 2.4rem; }
-  h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 14px; }
-  .muted { color: var(--muted); }
-  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
-  button { font: inherit; cursor: pointer; border-radius: 999px; padding: 8px 16px; border: 1px solid var(--accent); background: transparent; color: var(--text); transition: .2s; }
-  button:hover:not(:disabled) { background: var(--accent); color: #fff; }
-  button.active { background: var(--accent); color: #fff; }
-  .servers { display: grid; gap: 10px; }
-  .server { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,.04); }
-  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; background: #22c55e; }
-  .dot.off { background: #64748b; }
-  .lock { font-size: .75rem; color: var(--muted); }
-  .repos { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-  .repo a { color: var(--text); text-decoration: none; font-weight: 600; }
-  .repo p { font-size: .85rem; color: var(--muted); margin-top: 6px; }
-  .quote { font-style: italic; color: var(--muted); margin-top: 12px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+
+  body {
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:var(--text); background:var(--bg); min-height:100vh; padding:48px 20px;
+    background-image:radial-gradient(900px circle at 15% -10%, var(--glow), transparent 60%);
+    background-attachment:fixed;
+    transition:background-color .4s, color .4s;
+  }
+
+  .wrap { max-width:960px; margin:auto; display:grid; gap:22px; }
+
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:18px; padding:26px;
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    animation:rise .6s ease both; transition:transform .25s, box-shadow .25s;
+  }
+  .card:hover { transform:translateY(-2px); box-shadow:0 12px 40px -18px var(--glow); }
+  .card:nth-child(2) { animation-delay:.08s; }
+  .card:nth-child(3) { animation-delay:.16s; }
+  .card:nth-child(4) { animation-delay:.24s; }
+  .card:nth-child(5) { animation-delay:.32s; }
+ h1 {
+    font-size:clamp(2rem,5vw,3.2rem); line-height:1.1;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:200% auto; animation:shine 6s linear infinite;
+  }
+  .role { font-size:1.1rem; color:var(--accent); margin-top:10px; min-height:1.6em; font-weight:600; }
+  .role::after { content:"|"; margin-left:3px; animation:blink 1s steps(2) infinite; }
+  .bio { color:var(--muted); margin-top:8px; max-width:560px; line-height:1.6; }
+  .quote { font-style:italic; color:var(--muted); margin-top:14px; min-height:1.4em; }
+
+  h2 {
+    font-size:.8rem; text-transform:uppercase; letter-spacing:.14em;
+    color:var(--muted); margin-bottom:16px; font-weight:700;
+  }
+
+  .btns { display:flex; flex-wrap:wrap; gap:10px; }
+  button {
+    font:inherit; font-size:.92rem; cursor:pointer; color:var(--text);
+    padding:9px 18px; border-radius:999px; border:1px solid var(--accent); background:transparent;
+    transition:background .2s, color .2s, transform .15s, box-shadow .2s;
+  }
+  button:hover { background:var(--accent); color:#fff; transform:translateY(-1px); box-shadow:0 6px 18px -8px var(--accent); }
+  button:focus-visible, input:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  button.active { background:var(--accent); color:#fff; box-shadow:0 0 0 4px var(--glow); }
+
+  .current { margin-top:14px; font-size:.9rem; color:var(--muted); }
+  .current strong { color:var(--accent); }
+
+  .servers { display:grid; gap:10px; }
+  .server {
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:14px 16px; border-radius:12px; background:var(--card); border:1px solid var(--border);
+  }
+  .server-name { display:flex; align-items:center; gap:10px; font-weight:600; }
+  .dot { width:10px; height:10px; border-radius:50%; background:#22c55e; box-shadow:0 0 10px #22c55e; }
+  .dot.off { background:#64748b; box-shadow:none; }
+  .tag { font-size:.72rem; padding:4px 10px; border-radius:999px; color:var(--muted); border:1px solid var(--border); }
+    .search {
+    width:100%; margin-bottom:16px; padding:12px 16px; border-radius:12px;
+    border:1px solid var(--border); background:transparent; color:var(--text); font:inherit;
+  }
+  .search::placeholder { color:var(--muted); }
+
+  .repos { display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); }
+  .repo {
+    display:block; padding:16px; border-radius:14px; border:1px solid var(--border);
+    background:var(--card); text-decoration:none; color:var(--text); transition:border-color .2s, transform .2s;
+  }
+  .repo:hover { border-color:var(--accent); transform:translateY(-2px); }
+  .repo-name { font-weight:700; margin-bottom:6px; }
+  .repo-desc { font-size:.85rem; color:var(--muted); line-height:1.5; min-height:2.6em; }
+  .repo-meta { font-size:.75rem; color:var(--muted); margin-top:10px; display:flex; gap:10px; }
+
+  .skeleton {
+    height:110px; border-radius:14px;
+    background:linear-gradient(90deg,var(--card) 25%,var(--border) 50%,var(--card) 75%);
+    background-size:200% 100%; animation:shimmer 1.4s infinite;
+  }
+  .empty { color:var(--muted); }
+
+  footer { text-align:center; font-size:.8rem; color:var(--muted); padding-top:6px; }
+
+  @keyframes rise    { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+  @keyframes shine   { to { background-position:200% center; } }
+  @keyframes blink   { 50% { opacity:0; } }
+  @keyframes shimmer { to { background-position:-200% 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation:none !important; transition:none !important; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="card">
-    <h1>Ray Wong</h1>
-    <p class="muted">Short bio goes here. One line about what you do.</p>
+    <h1>YOUR NAME</h1>
+    <p class="role" id="role"></p>
+    <p class="bio">Short bio goes here. One line about what you do.</p>
     <p class="quote" id="quote"></p>
   </header>
-
   <section class="card">
     <h2>Mode</h2>
     <div class="btns" id="modes"></div>
@@ -50,25 +129,33 @@
   <section class="card">
     <h2>Configs</h2>
     <div class="btns" id="configs"></div>
+    <p class="current" id="configNote"></p>
   </section>
 
   <section class="card">
-    <h2>Servers (one active at a time)</h2>
+    <h2>Servers (one optional server active at a time)</h2>
     <div class="servers" id="servers"></div>
   </section>
 
   <section class="card">
     <h2>GitHub Projects</h2>
-    <div class="repos" id="repos"><p class="muted">Loading...</p></div>
+    <input class="search" id="search" type="search" placeholder="Search projects by name, description or language">
+    <div class="repos" id="repos">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
   </section>
 
+  <footer>&copy; <span id="year"></span> YOUR NAME</footer>
 </div>
 
 <script>
   const GITHUB_USER = "PEIXIANG101";
 
-  // Default servers: always on, cannot be deactivated
-  // Optional servers: only one can be active at a time
+  // Roles shown in the rotating line under your name
+  const roles = ["Your role here", "Your focus here", "Something you build"];
+
+  // Default servers are always on and cannot be deactivated.
+  // Optional servers: only one can be active at a time.
   const servers = [
     { name: "Default Server A", locked: true },
     { name: "Default Server B", locked: true },
@@ -84,58 +171,13 @@
     "martial":      { label: "Martial",      quote: "Discipline. Focus. Execution." }
   };
 
-  // Configs apply a mode and an optional active server
+  // Each config sets a mode and one optional server
   const configs = {
     "Jesus Config":  { mode: "quiet",        server: "Server 1" },
     "Cringy Config": { mode: "gen-z",        server: "Server 2" },
     "ACMI Config":   { mode: "professional", server: "Server 3" }
   };
-
-  let activeServer = null;
-
-  function setMode(key) {
-    document.body.className = key;
-    document.getElementById("quote").textContent = modes[key].quote;
-    document.querySelectorAll("#modes button").forEach(b =>
-      b.classList.toggle("active", b.dataset.mode === key));
-    localStorage.setItem("mode", key);
-  }
-
-  function setServer(name) {
-    const s = servers.find(x => x.name === name);
-    if (!s || s.locked) return;
-    activeServer = (activeServer === name) ? null : name; // click again to deactivate
-    renderServers();
-    localStorage.setItem("server", activeServer || "");
-  }
-
-  function renderServers() {
-    const box = document.getElementById("servers");
-    box.innerHTML = "";
-    servers.forEach(s => {
-      const on = s.locked || s.name === activeServer;
-      const row = document.createElement("div");
-      row.className = "server";
-      row.innerHTML = `<span><span class="dot ${on ? "" : "off"}"></span>${s.name}</span>`;
-      if (s.locked) {
-        row.insertAdjacentHTML("beforeend", `<span class="lock">Always on</span>`);
-      } else {
-        const btn = document.createElement("button");
-        btn.textContent = s.name === activeServer ? "Active" : "Activate";
-        btn.className = s.name === activeServer ? "active" : "";
-        btn.onclick = () => setServer(s.name);
-        row.appendChild(btn);
-      }
-      box.appendChild(row);
-    });
-  }
-
-  function applyConfig(name) {
-    const c = configs[name];
-    setMode(c.mode);
-    activeServer = c.server;
-    renderServers();
-  }
+    let activeServer = null;
 
   // Build mode buttons
   const modesBox = document.getElementById("modes");
@@ -156,29 +198,128 @@
     configsBox.appendChild(btn);
   });
 
-  // Load public GitHub repos (no token needed)
+  function setMode(key) {
+    document.body.className = key;
+    document.getElementById("quote").textContent = modes[key].quote;
+    document.querySelectorAll("#modes button").forEach(b =>
+      b.classList.toggle("active", b.dataset.mode === key));
+    localStorage.setItem("mode", key);
+  }
+
+  function setServer(name) {
+    const s = servers.find(x => x.name === name);
+    if (!s || s.locked) return;
+    activeServer = (activeServer === name) ? null : name; // click again to deactivate
+    renderServers();
+  }
+
+  function renderServers() {
+    const box = document.getElementById("servers");
+    box.innerHTML = "";
+    servers.forEach(s => {
+      const on = s.locked || s.name === activeServer;
+      const row = document.createElement("div");
+      row.className = "server";
+
+      const left = document.createElement("span");
+      left.className = "server-name";
+      left.innerHTML = `<span class="dot ${on ? "" : "off"}"></span>`;
+      left.append(s.name);
+      row.appendChild(left);
+
+      if (s.locked) {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = "Always on";
+        row.appendChild(tag);
+      } else {
+        const isActive = s.name === activeServer;
+        const btn = document.createElement("button");
+        btn.textContent = isActive ? "Active" : "Activate";
+        btn.className = isActive ? "active" : "";
+        btn.onclick = () => setServer(s.name);
+        row.appendChild(btn);
+      }
+      box.appendChild(row);
+    });
+  }
+
+  function applyConfig(name) {
+    const c = configs[name];
+    setMode(c.mode);
+    activeServer = c.server;
+    renderServers();
+    document.getElementById("configNote").innerHTML =
+      `Active config: <strong>${name}</strong>, server: <strong>${c.server}</strong>`;
+  }
+
+  // Rotate the role line under your name
+  let roleIndex = 0;
+  function rotateRole() {
+    document.getElementById("role").textContent = roles[roleIndex];
+    roleIndex = (roleIndex + 1) % roles.length;
+  }
+
+  // GitHub projects
+  let allRepos = [];
+
+  function renderRepos(filter = "") {
+    const box = document.getElementById("repos");
+    const q = filter.trim().toLowerCase();
+    const list = allRepos.filter(r =>
+      [r.name, r.description || "", r.language || ""].join(" ").toLowerCase().includes(q));
+
+    box.innerHTML = "";
+    if (list.length === 0) {
+      box.innerHTML = `<p class="empty">No projects match your search.</p>`;
+      return;
+    }
+    list.forEach(r => {
+      const a = document.createElement("a");
+      a.className = "repo";
+      a.href = r.html_url;
+      a.target = "_blank";
+      a.rel = "noopener";
+
+      const name = document.createElement("div");
+      name.className = "repo-name";
+      name.textContent = r.name;
+
+      const desc = document.createElement("div");
+      desc.className = "repo-desc";
+      desc.textContent = r.description || "No description yet.";
+
+      const meta = document.createElement("div");
+      meta.className = "repo-meta";
+      meta.innerHTML = `<span>${r.language || "Misc"}</span><span>★ ${r.stargazers_count}</span>`;
+
+      a.append(name, desc, meta);
+      box.appendChild(a);
+    });
+  }
+
   async function loadRepos() {
     const box = document.getElementById("repos");
     try {
-      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=6`);
+      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=30`);
       if (!res.ok) throw new Error(res.status);
-      const repos = await res.json();
-      box.innerHTML = "";
-      repos.filter(r => !r.fork).forEach(r => {
-        const card = document.createElement("div");
-        card.className = "repo card";
-        card.innerHTML = `<a href="${r.html_url}" target="_blank" rel="noopener">${r.name}</a><p>${r.description || "No description yet."}</p>`;
-        box.appendChild(card);
-      });
+      const data = await res.json();
+      allRepos = data.filter(r => !r.fork);
+      renderRepos();
     } catch (e) {
-      box.innerHTML = `<p class="muted">Could not load GitHub repos. Check your username and that your repos are public.</p>`;
+      box.innerHTML = `<p class="empty">Could not load GitHub projects. Check your username and that your repos are public.</p>`;
     }
   }
 
   // Start the page
+  document.getElementById("search").addEventListener("input", e => renderRepos(e.target.value));
+  document.getElementById("year").textContent = new Date().getFullYear();
   setMode(localStorage.getItem("mode") || "gen-z");
   renderServers();
+  rotateRole();
+  setInterval(rotateRole, 2500);
   loadRepos();
 </script>
 </body>
 </html>
+
