@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YOUR NAME</title>
+<title>RAY WONG</title>
 <style>
   /* ===== Theme variables (one per mode) ===== */
   :root {
@@ -181,7 +181,7 @@
 <div class="wrap">
 
   <header class="card">
-    <h1>YOUR NAME</h1>
+    <h1>RAY WONG</h1>
     <p class="role" id="role"></p>
     <p class="bio">Short bio goes here. One line about what you do.</p>
     <p class="quote" id="quote"></p>
@@ -250,7 +250,7 @@
     </div>
   </section>
 
-  <footer>&copy; <span id="year"></span> YOUR NAME</footer>
+  <footer>&copy; <span id="year"></span> RAY WONG</footer>
 
 </div>
 <script>
@@ -659,59 +659,47 @@
 
   // ===== Status values: editable demo data, not measured traits =====
   function updateStatus() {
-    const server = getServer(selectedServerId);
-    const activeKey = document.body.className;
-    const activeMode = server && server.modes.includes(activeKey)
-      ? modes[activeKey]
-      : null;
+  const myStats = {
+    strength: 3,
+    intellect: 2,
+    empathy: 3,
+    speed: 2,
+    adaptability: 4,
+    patience: 3
+  };
 
-    const container = document.getElementById("hex-stats");
-    container.replaceChildren();
+  const container = document.getElementById("hex-stats");
+  container.replaceChildren();
 
-    attributes.forEach((attribute, index) => {
-      const value = activeMode ? activeMode.stats[attribute.key] : 0;
+  // Convert /6 scores into percentages for the existing hexagon.
+  const hexStats = {};
 
-      document.getElementById(`hex-label-${index}`).textContent =
-        attribute.label;
+  attributes.forEach((attribute, index) => {
+    const score = myStats[attribute.key];
+    const percentage = (score / 6) * 100;
 
-      const row = makeElement("div", "stat-row");
-      const slider = document.createElement("input");
-      slider.type = "range";
-      slider.min = "0";
-      slider.max = "100";
-      slider.value = String(value);
-      slider.disabled = !activeMode;
-      slider.style.width = "100%";
-      slider.setAttribute("aria-label", `${attribute.label} demo score`);
+    hexStats[attribute.key] = percentage;
 
-      const output = makeElement("span", "stat-val", String(value));
+    document.getElementById(`hex-label-${index}`).textContent =
+      attribute.label;
 
-      slider.addEventListener("input", () => {
-        activeMode.stats[attribute.key] = Number(slider.value);
-        output.textContent = slider.value;
-        drawStatus(activeMode.stats);
-      });
+    const row = makeElement("div", "stat-row");
+    const label = makeElement("span", "", attribute.label);
 
-      row.append(
-        makeElement("span", "", attribute.label),
-        slider,
-        output
-      );
-      container.appendChild(row);
-    });
+    const bar = makeElement("div", "stat-bar");
+    const fill = makeElement("div", "stat-fill");
+    fill.style.width = `${percentage}%`;
+    bar.appendChild(fill);
 
-    const note = makeElement(
-      "p",
-      "hint",
-      activeMode
-        ? "Illustrative scores only. Adjust sliders to test Tweek. " +
-          "Score edits reset when you reload."
-        : "Select a server, then activate one of its modes."
-    );
-    container.appendChild(note);
+    const value = makeElement("span", "stat-val", `${score}/6`);
 
-    drawStatus(activeMode ? activeMode.stats : {});
-  }
+    row.append(label, bar, value);
+    container.appendChild(row);
+  });
+
+  drawStatus(hexStats);
+}
+
 
   // ===== Update the existing hexagon and Tweek alert =====
   function drawStatus(stats) {
