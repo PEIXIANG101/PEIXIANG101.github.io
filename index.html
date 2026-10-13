@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YOUR NAME</title>
 <style>
+  /* ===== Theme variables (one per mode) ===== */
   :root {
     --accent:#2563EB; --accent-2:#0D9488;
     --bg:#0b1020; --text:#e6e9f2; --muted:#8a93a8;
@@ -16,8 +17,9 @@
   body.professional { --accent:#2563EB; --accent-2:#0D9488; --bg:#f1f5f9; --text:#0f172a; --muted:#64748b;
                       --card:rgba(255,255,255,.9); --border:rgba(15,23,42,.08); --glow:rgba(37,99,235,.18); }
   body.martial      { --accent:#DC2626; --accent-2:#EA580C; --bg:#0a0a0a; --glow:rgba(220,38,38,.35); }
-
-  * { box-sizing:border-box; margin:0; padding:0; }
+  body.home         { --accent:#F59E0B; --accent-2:#84CC16; --bg:#1a1409; --glow:rgba(245,158,11,.3); }
+  body.sports       { --accent:#22C55E; --accent-2:#06B6D4; --bg:#06140d; --glow:rgba(34,197,94,.3); }
+* { box-sizing:border-box; margin:0; padding:0; }
 
   body {
     font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -35,11 +37,8 @@
     animation:rise .6s ease both; transition:transform .25s, box-shadow .25s;
   }
   .card:hover { transform:translateY(-2px); box-shadow:0 12px 40px -18px var(--glow); }
-  .card:nth-child(2) { animation-delay:.08s; }
-  .card:nth-child(3) { animation-delay:.16s; }
-  .card:nth-child(4) { animation-delay:.24s; }
-  .card:nth-child(5) { animation-delay:.32s; }
- h1 {
+
+  h1 {
     font-size:clamp(2rem,5vw,3.2rem); line-height:1.1;
     background:linear-gradient(90deg,var(--accent),var(--accent-2));
     -webkit-background-clip:text; background-clip:text; color:transparent;
@@ -62,22 +61,85 @@
     transition:background .2s, color .2s, transform .15s, box-shadow .2s;
   }
   button:hover { background:var(--accent); color:#fff; transform:translateY(-1px); box-shadow:0 6px 18px -8px var(--accent); }
-  button:focus-visible, input:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
   button.active { background:var(--accent); color:#fff; box-shadow:0 0 0 4px var(--glow); }
-
-  .current { margin-top:14px; font-size:.9rem; color:var(--muted); }
-  .current strong { color:var(--accent); }
-
-  .servers { display:grid; gap:10px; }
-  .server {
-    display:flex; justify-content:space-between; align-items:center; gap:12px;
-    padding:14px 16px; border-radius:12px; background:var(--card); border:1px solid var(--border);
+  button.danger { border-color:#DC2626; }
+  button.danger:hover { background:#DC2626; }
+  /* ===== Server list ===== */
+  .servers-grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); }
+  .server-card {
+    padding:16px; border-radius:14px; border:1px solid var(--border); background:var(--card);
+    cursor:pointer; transition:border-color .2s, box-shadow .2s, transform .2s;
   }
-  .server-name { display:flex; align-items:center; gap:10px; font-weight:600; }
-  .dot { width:10px; height:10px; border-radius:50%; background:#22c55e; box-shadow:0 0 10px #22c55e; }
+  .server-card:hover { transform:translateY(-2px); border-color:var(--accent); }
+  .server-card.selected { border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+  .server-head { display:flex; justify-content:space-between; align-items:center; gap:8px; font-weight:700; }
+  .server-meta { font-size:.75rem; color:var(--muted); margin-top:8px; }
+
+  .dot { width:10px; height:10px; border-radius:50%; background:#22c55e; box-shadow:0 0 10px #22c55e; flex-shrink:0; }
   .dot.off { background:#64748b; box-shadow:none; }
-  .tag { font-size:.72rem; padding:4px 10px; border-radius:999px; color:var(--muted); border:1px solid var(--border); }
-    .search {
+
+  .tag { font-size:.7rem; padding:4px 10px; border-radius:999px; color:var(--muted); border:1px solid var(--border); white-space:nowrap; }
+
+  /* ===== Mode slots (3 per server) ===== */
+  .slots { display:grid; gap:10px; }
+  .slot {
+    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+    padding:14px 16px; border-radius:12px; border:1px dashed var(--border); background:var(--card);
+  }
+  .slot.filled { border-style:solid; }
+  .slot-name { font-weight:600; }
+  .slot-empty { color:var(--muted); font-style:italic; }
+  .slot-actions { display:flex; gap:6px; flex-wrap:wrap; }
+  button.small { padding:5px 12px; font-size:.8rem; }
+
+  .add-form { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .field {
+    padding:9px 14px; border-radius:999px; border:1px solid var(--border);
+    background:var(--card); color:var(--text); font:inherit; font-size:.92rem; min-width:0; flex:1 1 160px;
+  }
+  .field::placeholder { color:var(--muted); }
+  .field:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  .hint { font-size:.8rem; color:var(--muted); margin-top:10px; }
+  .error { font-size:.85rem; color:#DC2626; margin-top:10px; min-height:1.2em; }
+
+  /* ===== Info box (opens when a server is clicked) ===== */
+  .info-box {
+    margin-top:18px; padding:20px; border-radius:14px;
+    border:1px solid var(--accent); background:var(--card);
+    animation:rise .3s ease both;
+  }
+  .info-box h3 { font-size:1.05rem; margin-bottom:6px; color:var(--accent); }
+  .info-box .info-intro { font-size:.88rem; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+  .info-list { display:grid; gap:10px; }
+  .info-item { padding:12px 14px; border-radius:10px; background:rgba(127,127,127,.08); }
+  .info-item strong { display:block; margin-bottom:4px; }
+  .info-item span { font-size:.85rem; color:var(--muted); line-height:1.5; }
+  /* ===== Status hexagon ===== */
+  .hex-wrap { display:grid; grid-template-columns:minmax(220px,300px) 1fr; gap:24px; align-items:center; }
+  @media (max-width:640px) { .hex-wrap { grid-template-columns:1fr; } }
+  .hex-svg { width:100%; max-width:300px; height:auto; overflow:visible; }
+  .hex-grid { fill:none; stroke:var(--border); stroke-width:1; }
+  .hex-shape { fill:var(--glow); stroke:var(--accent); stroke-width:2; transition:points .5s ease; }
+  .hex-label { font-size:11px; fill:var(--muted); text-anchor:middle; letter-spacing:.06em; text-transform:uppercase; }
+  .hex-stats { display:grid; gap:10px; }
+  .stat-row { display:grid; grid-template-columns:90px 1fr 40px; gap:10px; align-items:center; font-size:.85rem; }
+  .stat-bar { height:8px; border-radius:999px; background:var(--border); overflow:hidden; }
+  .stat-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .5s ease; }
+  .stat-val { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+
+  /* ===== Tweek alert (shows when Intellect or Patience peaks) ===== */
+  .tweek-alert {
+    display:none; margin-top:16px; padding:14px 18px; border-radius:12px;
+    border:1px solid #F59E0B; background:rgba(245,158,11,.12); color:var(--text);
+    animation:rise .4s ease both;
+  }
+  .tweek-alert.show { display:block; }
+  .tweek-alert strong { color:#F59E0B; }
+  .tweek-alert .pulse { display:inline-block; width:8px; height:8px; border-radius:50%; background:#F59E0B; margin-right:8px; animation:pulse 1.2s infinite; }
+
+  /* ===== GitHub project cards ===== */
+  .search {
     width:100%; margin-bottom:16px; padding:12px 16px; border-radius:12px;
     border:1px solid var(--border); background:transparent; color:var(--text); font:inherit;
   }
@@ -86,7 +148,8 @@
   .repos { display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); }
   .repo {
     display:block; padding:16px; border-radius:14px; border:1px solid var(--border);
-    background:var(--card); text-decoration:none; color:var(--text); transition:border-color .2s, transform .2s;
+    background:var(--card); text-decoration:none; color:var(--text);
+    transition:border-color .2s, transform .2s;
   }
   .repo:hover { border-color:var(--accent); transform:translateY(-2px); }
   .repo-name { font-weight:700; margin-bottom:6px; }
@@ -102,15 +165,17 @@
 
   footer { text-align:center; font-size:.8rem; color:var(--muted); padding-top:6px; }
 
+  /* ===== Animations ===== */
   @keyframes rise    { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
   @keyframes shine   { to { background-position:200% center; } }
   @keyframes blink   { 50% { opacity:0; } }
   @keyframes shimmer { to { background-position:-200% 0; } }
+  @keyframes pulse   { 0%,100% { opacity:1; } 50% { opacity:.3; } }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation:none !important; transition:none !important; }
   }
-</style>
+  </style>
 </head>
 <body>
 <div class="wrap">
@@ -121,20 +186,60 @@
     <p class="bio">Short bio goes here. One line about what you do.</p>
     <p class="quote" id="quote"></p>
   </header>
+
   <section class="card">
     <h2>Mode</h2>
     <div class="btns" id="modes"></div>
   </section>
 
   <section class="card">
-    <h2>Configs</h2>
-    <div class="btns" id="configs"></div>
-    <p class="current" id="configNote"></p>
+    <h2>Servers (select one to view its 3 mode slots)</h2>
+    <div class="servers-grid" id="servers"></div>
   </section>
 
   <section class="card">
-    <h2>Servers (one optional server active at a time)</h2>
-    <div class="servers" id="servers"></div>
+    <h2 id="detail-title">Select a server</h2>
+    <p class="hint" id="detail-hint">Click a server above to see and manage its modes.</p>
+    <div class="slots" id="slots"></div>
+
+    <div class="add-form" id="add-form" hidden>
+      <select class="field" id="mode-select" aria-label="Choose a mode to add"></select>
+      <button id="add-btn">Add mode</button>
+    </div>
+    <p class="error" id="error"></p>
+
+    <div class="info-box" id="info-box" hidden></div>
+  </section>
+
+  <section class="card">
+    <h2>Configs</h2>
+    <div class="btns" id="configs"></div>
+    <p class="hint" id="configNote"></p>
+  </section>
+
+  <section class="card">
+    <h2>Status</h2>
+    <div class="hex-wrap">
+      <svg class="hex-svg" viewBox="0 0 300 300" role="img" aria-label="Status hexagon">
+        <!-- Grid rings -->
+        <polygon class="hex-grid" points="150,50 236.6,100 236.6,200 150,250 63.4,200 63.4,100"/>
+        <polygon class="hex-grid" points="150,84 207.2,117 207.2,183 150,216 92.8,183 92.8,117"/>
+        <polygon class="hex-grid" points="150,117 178.6,133.5 178.6,166.5 150,183 121.4,166.5 121.4,133.5"/>
+        <!-- Stat shape (points set by script) -->
+        <polygon class="hex-shape" id="hex-shape" points="150,150 150,150 150,150 150,150 150,150 150,150"/>
+        <!-- Labels (text set by script) -->
+        <text class="hex-label" id="hex-label-0" x="150" y="24">Stat</text>
+        <text class="hex-label" id="hex-label-1" x="262" y="89">Stat</text>
+        <text class="hex-label" id="hex-label-2" x="262" y="215">Stat</text>
+        <text class="hex-label" id="hex-label-3" x="150" y="284">Stat</text>
+        <text class="hex-label" id="hex-label-4" x="38" y="215">Stat</text>
+        <text class="hex-label" id="hex-label-5" x="38" y="89">Stat</text>
+      </svg>
+      <div class="hex-stats" id="hex-stats"></div>
+    </div>
+    <div class="tweek-alert" id="tweek-alert">
+      <span class="pulse"></span><strong>Tweek triggered.</strong> <span id="tweek-text"></span>
+    </div>
   </section>
 
   <section class="card">
@@ -146,180 +251,747 @@
   </section>
 
   <footer>&copy; <span id="year"></span> YOUR NAME</footer>
-</div>
 
+</div>
 <script>
   const GITHUB_USER = "PEIXIANG101";
+  const MAX_MODES_PER_SERVER = 3;
+  const TWEEK_THRESHOLD = 90; // Tweek triggers when Intellect or Patience reaches this value
 
-  // Roles shown in the rotating line under your name
+  // Rotating role line under your name (placeholders)
   const roles = ["Your role here", "Your focus here", "Something you build"];
 
-  // Default servers are always on and cannot be deactivated.
-  // Optional servers: only one can be active at a time.
-  const servers = [
-    { name: "Default Server A", locked: true },
-    { name: "Default Server B", locked: true },
-    { name: "Server 1", locked: false },
-    { name: "Server 2", locked: false },
-    { name: "Server 3", locked: false }
+  // Six hexagon attributes. The document lists "Speed" twice, so the sixth is set to
+  // "Patience" as a placeholder. Change the label if you meant something else.
+  const attributes = [
+    { key: "strength",     label: "Strength" },
+    { key: "intellect",    label: "Intellect" },
+    { key: "empathy",      label: "Empathy" },
+    { key: "speed",        label: "Speed" },
+    { key: "adaptability", label: "Adaptability" },
+    { key: "patience",     label: "Patience" }
   ];
 
+  // Mode library. Stats are base values from 0 to 100 for the hexagon.
   const modes = {
-    "gen-z":        { label: "Gen Z",        quote: "No cap, this is the vibe." },
-    "quiet":        { label: "Quiet",        quote: "Speaks softly. Builds quietly." },
-    "professional": { label: "Professional", quote: "Focused on delivering results." },
-    "martial":      { label: "Martial",      quote: "Discipline. Focus. Execution." }
+    "gen-z": {
+      label: "Gen Z", quote: "No cap, this is the vibe.",
+      info: "Loud, fast and trend-led. High energy with a playful tone.",
+      stats: { strength: 55, intellect: 50, empathy: 70, speed: 85, adaptability: 75, patience: 35 }
+    },
+    "quiet": {
+      label: "Quiet", quote: "Speaks softly. Builds quietly.",
+      info: "Calm and measured. Low noise, steady focus.",
+      stats: { strength: 45, intellect: 80, empathy: 65, speed: 40, adaptability: 50, patience: 85 }
+    },
+    "professional": {
+      label: "Professional", quote: "Focused on delivering results.",
+      info: "Structured, polished and reliable. Built for clear outcomes.",
+      stats: { strength: 65, intellect: 85, empathy: 55, speed: 60, adaptability: 60, patience: 70 }
+    },
+    "martial": {
+      label: "Martial", quote: "Discipline. Focus. Execution.",
+      info: "Disciplined and decisive. Strength and endurance first.",
+      stats: { strength: 92, intellect: 50, empathy: 35, speed: 70, adaptability: 60, patience: 75 }
+    },
+    "home": {
+      label: "Home Mode", quote: "Comfort first. Recharge here.",
+      info: "Relaxed and familiar. Supports empathy and steady recovery.",
+      stats: { strength: 40, intellect: 60, empathy: 90, speed: 30, adaptability: 55, patience: 80 }
+    },
+    "sports": {
+      label: "Sports Mode", quote: "Play hard. Recover harder.",
+      info: "Competitive and physical. Boosts speed, strength and adaptability.",
+      stats: { strength: 85, intellect: 40, empathy: 50, speed: 92, adaptability: 88, patience: 45 }
+    }
   };
 
-  // Each config sets a mode and one optional server
+  // Servers. Default servers can't be deactivated. Each server holds up to 3 modes.
+  // Server names are placeholders. Replace them with your real server names.
+  const servers = [
+    { id: "A", name: "Default Server A", locked: true,  modes: ["quiet", "professional", "martial"] },
+    { id: "B", name: "Default Server B", locked: true,  modes: ["gen-z", "home", "sports"] },
+    { id: "1", name: "Server 1",         locked: false, modes: [] },
+    { id: "2", name: "Server 2",         locked: false, modes: [] },
+    { id: "3", name: "Server 3",         locked: false, modes: [] }
+  ];
+
+  // Configs. Info text appears in the info box when a server is clicked.
+  // Tweek is automatic: it triggers and is not applied by a button.
   const configs = {
-    "Jesus Config":  { mode: "quiet",        server: "Server 1" },
-    "Cringy Config": { mode: "gen-z",        server: "Server 2" },
-    "ACMI Config":   { mode: "professional", server: "Server 3" }
+    "Jesus Config": {
+      mode: "quiet", server: "1",
+      info: "Jesus Config: calm, humble and steady. Applies Quiet mode to Server 1."
+    },
+    "Cringy Config": {
+      mode: "gen-z", server: "2",
+      info: "Cringy Config: loud and unfiltered. Applies Gen Z mode to Server 2."
+    },
+    "ACMI Config": {
+      mode: "professional", server: "3",
+      info: "ACMI Config (Anti Care for My Image): polished and results-first. Applies Professional mode to Server 3."
+    },
+    "Tweek": {
+      auto: true, trigger: "Intellect or Patience reaches " + TWEEK_THRESHOLD,
+      info: "Tweek: an automatic config. It triggers when Intellect or Patience peaks, and it shows an alert in the Status section."
+    }
   };
-    let activeServer = null;
+// ===== State =====
+  let selectedServerId = null;
 
-  // Build mode buttons
-  const modesBox = document.getElementById("modes");
-  Object.entries(modes).forEach(([key, { label }]) => {
-    const btn = document.createElement("button");
-    btn.textContent = label;
-    btn.dataset.mode = key;
-    btn.onclick = () => setMode(key);
-    modesBox.appendChild(btn);
-  });
+  // ===== Feedback =====
+  function showError(msg) { document.getElementById("error").textContent = msg; }
+  function clearError() { document.getElementById("error").textContent = ""; }
 
-  // Build config buttons
-  const configsBox = document.getElementById("configs");
-  Object.keys(configs).forEach(name => {
-    const btn = document.createElement("button");
-    btn.textContent = name;
-    btn.onclick = () => applyConfig(name);
-    configsBox.appendChild(btn);
-  });
+  // ===== Helpers =====
+  function getServer(id) { return servers.find(s => s.id === id); }
 
+  // ===== Saving (keeps your changes after a refresh) =====
+  function saveState() {
+    localStorage.setItem("servers", JSON.stringify(servers.map(s => ({ id: s.id, modes: s.modes }))));
+  }
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("servers") || "null");
+      if (!saved) return;
+      saved.forEach(sv => {
+        const s = getServer(sv.id);
+        if (s) s.modes = sv.modes.slice(0, MAX_MODES_PER_SERVER);
+      });
+    } catch (e) {
+      // Ignore corrupted saved data and use the defaults
+    }
+  }
+
+  // Re-draw everything that depends on servers
+  function refresh() {
+    saveState();
+    renderServers();
+    renderDetail();
+  }
+
+  // ===== Mode =====
   function setMode(key) {
+    if (!modes[key]) return;
     document.body.className = key;
     document.getElementById("quote").textContent = modes[key].quote;
-    document.querySelectorAll("#modes button").forEach(b =>
-      b.classList.toggle("active", b.dataset.mode === key));
     localStorage.setItem("mode", key);
+    updateModeButtons(); // defined in Part 8
+    updateStatus();      // defined in Part 8
   }
 
-  function setServer(name) {
-    const s = servers.find(x => x.name === name);
-    if (!s || s.locked) return;
-    activeServer = (activeServer === name) ? null : name; // click again to deactivate
+  // ===== Server selection (one server at a time) =====
+  function selectServer(id) {
+    selectedServerId = id;
+    clearError();
     renderServers();
+    renderDetail();
   }
 
+  // ===== Add, change and delete modes (max 3 per server) =====
+  function addMode() {
+    const srv = getServer(selectedServerId);
+    const key = document.getElementById("mode-select").value;
+    clearError();
+
+    if (!srv) return showError("Select a server first.");
+    if (!key) return showError("Choose a mode to add.");
+    if (srv.modes.includes(key)) return showError(`${modes[key].label} is already on ${srv.name}.`);
+    if (srv.modes.length >= MAX_MODES_PER_SERVER) {
+      return showError(`${srv.name} already holds ${MAX_MODES_PER_SERVER} modes. Delete or change one first.`);
+    }
+
+    srv.modes.push(key);
+    refresh();
+  }
+
+ function changeMode(index, newKey) {
+  const srv = getServer(selectedServerId);
+  clearError();
+
+  if (!srv) return;
+  if (!modes[newKey]) return showError("Choose a valid mode.");
+  if (!Number.isInteger(index) || index < 0 || index >= srv.modes.length) {
+    return showError("Invalid mode slot.");
+  }
+
+  if (srv.modes.includes(newKey) && srv.modes[index] !== newKey) {
+    return showError(`${modes[newKey].label} is already on ${srv.name}.`);
+  }
+
+  srv.modes[index] = newKey;
+  refresh();
+}
+
+
+  function deleteMode(index) {
+    const srv = getServer(selectedServerId);
+    clearError();
+    if (!srv) return;
+    srv.modes.splice(index, 1);
+    refresh();
+  }
+  // ===== Small element helper =====
+  function makeElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+  }
+
+  // Hidden must override the earlier display:flex styles.
+  const visibilityStyle = document.createElement("style");
+  visibilityStyle.textContent = `
+    [hidden] { display: none !important; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .server-card { text-align: left; width: 100%; }
+    .repo-name { overflow-wrap: anywhere; }
+    select.field option { background: var(--bg); color: var(--text); }
+  `;
+  document.head.appendChild(visibilityStyle);
+
+  // ===== Server cards =====
   function renderServers() {
-    const box = document.getElementById("servers");
-    box.innerHTML = "";
-    servers.forEach(s => {
-      const on = s.locked || s.name === activeServer;
-      const row = document.createElement("div");
-      row.className = "server";
+    const container = document.getElementById("servers");
+    container.replaceChildren();
 
-      const left = document.createElement("span");
-      left.className = "server-name";
-      left.innerHTML = `<span class="dot ${on ? "" : "off"}"></span>`;
-      left.append(s.name);
-      row.appendChild(left);
+    servers.forEach(server => {
+      const selected = selectedServerId === server.id;
+      const card = makeElement(
+        "button",
+        "server-card" + (selected ? " selected" : "")
+      );
 
-      if (s.locked) {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = "Always on";
-        row.appendChild(tag);
-      } else {
-        const isActive = s.name === activeServer;
-        const btn = document.createElement("button");
-        btn.textContent = isActive ? "Active" : "Activate";
-        btn.className = isActive ? "active" : "";
-        btn.onclick = () => setServer(s.name);
-        row.appendChild(btn);
-      }
-      box.appendChild(row);
+      card.type = "button";
+      card.setAttribute("aria-pressed", String(selected));
+
+      const heading = makeElement("span", "server-head");
+      heading.append(
+        makeElement("span", "", server.name),
+        makeElement(
+          "span",
+          "dot" + (server.locked || selected ? "" : " off")
+        )
+      );
+
+      const description = makeElement(
+        "span",
+        "server-meta",
+        `${server.modes.length}/${MAX_MODES_PER_SERVER} modes · ` +
+        (server.locked
+          ? "Always on"
+          : selected ? "Selected" : "Available")
+      );
+      description.style.display = "block";
+
+      card.append(heading, description);
+      card.addEventListener("click", () => selectServer(server.id));
+      container.appendChild(card);
     });
   }
 
-  function applyConfig(name) {
-    const c = configs[name];
-    setMode(c.mode);
-    activeServer = c.server;
-    renderServers();
-    document.getElementById("configNote").innerHTML =
-      `Active config: <strong>${name}</strong>, server: <strong>${c.server}</strong>`;
+  // ===== Only show modes belonging to the selected server =====
+  function updateModeButtons() {
+    const container = document.getElementById("modes");
+    const server = getServer(selectedServerId);
+    container.replaceChildren();
+
+    if (!server) {
+      container.appendChild(
+        makeElement("p", "hint", "Select a server first to see its modes.")
+      );
+      return;
+    }
+
+    // A removed mode must not remain active.
+    if (!server.modes.includes(document.body.className)) {
+      document.body.className = "";
+      document.getElementById("quote").textContent =
+        "Choose one of this server's modes.";
+    }
+
+    if (server.modes.length === 0) {
+      container.appendChild(
+        makeElement("p", "hint", "No modes yet. Add one below.")
+      );
+      return;
+    }
+
+    server.modes.forEach(key => {
+      if (!modes[key]) return;
+
+      const active = document.body.className === key;
+      const button = makeElement(
+        "button",
+        active ? "active" : "",
+        modes[key].label
+      );
+
+      button.type = "button";
+      button.setAttribute("aria-pressed", String(active));
+      button.addEventListener("click", () => setMode(key));
+      container.appendChild(button);
+    });
   }
 
-  // Rotate the role line under your name
+  // ===== Mode slots and management =====
+  function renderDetail() {
+    const server = getServer(selectedServerId);
+    const slots = document.getElementById("slots");
+    const form = document.getElementById("add-form");
+    const picker = document.getElementById("mode-select");
+    const info = document.getElementById("info-box");
+
+    slots.replaceChildren();
+    picker.replaceChildren();
+    form.hidden = !server;
+    info.hidden = !server;
+
+    document.getElementById("detail-title").textContent =
+      server ? `${server.name} — mode slots` : "Select a server";
+
+    document.getElementById("detail-hint").textContent = server
+      ? "Add, replace or delete modes. Each server holds up to three."
+      : "Click a server above to see and manage its modes.";
+
+    if (!server) {
+      updateModeButtons();
+      updateStatus();
+      return;
+    }
+
+    for (let index = 0; index < MAX_MODES_PER_SERVER; index++) {
+      const key = server.modes[index];
+      const row = makeElement("div", "slot" + (key ? " filled" : ""));
+
+      row.appendChild(makeElement(
+        "span",
+        key ? "slot-name" : "slot-empty",
+        key && modes[key]
+          ? `${index + 1}. ${modes[key].label}`
+          : `${index + 1}. Empty slot`
+      ));
+
+      if (key && modes[key]) {
+        const actions = makeElement("div", "slot-actions");
+        const replacement = makeElement("select", "field");
+
+        replacement.setAttribute(
+          "aria-label",
+          `Replace mode in slot ${index + 1}`
+        );
+
+        Object.entries(modes).forEach(([candidate, definition]) => {
+          if (candidate !== key && server.modes.includes(candidate)) return;
+
+          const option = makeElement("option", "", definition.label);
+          option.value = candidate;
+          option.selected = candidate === key;
+          replacement.appendChild(option);
+        });
+
+        replacement.addEventListener("change", () => {
+          changeMode(index, replacement.value);
+        });
+
+        const remove = makeElement("button", "small danger", "Delete");
+        remove.type = "button";
+        remove.setAttribute(
+          "aria-label",
+          `Delete ${modes[key].label} from ${server.name}`
+        );
+        remove.addEventListener("click", () => deleteMode(index));
+
+        actions.append(replacement, remove);
+        row.appendChild(actions);
+      }
+
+      slots.appendChild(row);
+    }
+
+    Object.entries(modes).forEach(([key, definition]) => {
+      if (server.modes.includes(key)) return;
+
+      const option = makeElement("option", "", definition.label);
+      option.value = key;
+      picker.appendChild(option);
+    });
+
+    const full = server.modes.length >= MAX_MODES_PER_SERVER;
+    picker.disabled = full;
+    document.getElementById("add-btn").disabled =
+      full || picker.options.length === 0;
+
+    renderInfoBox(server);
+    updateModeButtons();
+    updateStatus();
+  }
+
+  // ===== Config explanations on every server click =====
+  function renderInfoBox(server) {
+    const box = document.getElementById("info-box");
+    box.replaceChildren();
+
+    box.append(
+      makeElement("h3", "", `${server.name} — config guide`),
+      makeElement(
+        "p",
+        "info-intro",
+        "Config descriptions are editable examples. " +
+        "Selecting a server does not automatically apply a config."
+      )
+    );
+
+    const list = makeElement("div", "info-list");
+
+    Object.entries(configs).forEach(([name, config]) => {
+      const item = makeElement("div", "info-item");
+      item.append(
+        makeElement("strong", "", name),
+        makeElement("span", "", config.info)
+      );
+      list.appendChild(item);
+    });
+
+    box.appendChild(list);
+  }
+
+  // ===== Status values: editable demo data, not measured traits =====
+  function updateStatus() {
+    const server = getServer(selectedServerId);
+    const activeKey = document.body.className;
+    const activeMode = server && server.modes.includes(activeKey)
+      ? modes[activeKey]
+      : null;
+
+    const container = document.getElementById("hex-stats");
+    container.replaceChildren();
+
+    attributes.forEach((attribute, index) => {
+      const value = activeMode ? activeMode.stats[attribute.key] : 0;
+
+      document.getElementById(`hex-label-${index}`).textContent =
+        attribute.label;
+
+      const row = makeElement("div", "stat-row");
+      const slider = document.createElement("input");
+      slider.type = "range";
+      slider.min = "0";
+      slider.max = "100";
+      slider.value = String(value);
+      slider.disabled = !activeMode;
+      slider.style.width = "100%";
+      slider.setAttribute("aria-label", `${attribute.label} demo score`);
+
+      const output = makeElement("span", "stat-val", String(value));
+
+      slider.addEventListener("input", () => {
+        activeMode.stats[attribute.key] = Number(slider.value);
+        output.textContent = slider.value;
+        drawStatus(activeMode.stats);
+      });
+
+      row.append(
+        makeElement("span", "", attribute.label),
+        slider,
+        output
+      );
+      container.appendChild(row);
+    });
+
+    const note = makeElement(
+      "p",
+      "hint",
+      activeMode
+        ? "Illustrative scores only. Adjust sliders to test Tweek. " +
+          "Score edits reset when you reload."
+        : "Select a server, then activate one of its modes."
+    );
+    container.appendChild(note);
+
+    drawStatus(activeMode ? activeMode.stats : {});
+  }
+
+  // ===== Update the existing hexagon and Tweek alert =====
+  function drawStatus(stats) {
+    const points = attributes.map((attribute, index) => {
+      const value = Math.max(
+        0,
+        Math.min(100, Number(stats[attribute.key]) || 0)
+      );
+      const angle = (index * 60 - 90) * Math.PI / 180;
+      return `${150 + Math.cos(angle) * value},` +
+             `${150 + Math.sin(angle) * value}`;
+    });
+
+    document.getElementById("hex-shape")
+      .setAttribute("points", points.join(" "));
+
+    const triggers = ["intellect", "patience"].filter(
+      key => Number(stats[key]) >= TWEEK_THRESHOLD
+    );
+
+    const alert = document.getElementById("tweek-alert");
+    alert.classList.toggle("show", triggers.length > 0);
+    alert.setAttribute("role", "status");
+
+    document.getElementById("tweek-text").textContent =
+      triggers.length
+        ? triggers.map(key => {
+            const attribute = attributes.find(item => item.key === key);
+            return `${attribute.label}: ${stats[key]}`;
+          }).join(" · ") + ` — threshold ${TWEEK_THRESHOLD} reached.`
+        : "";
+  }
+    // ===== Apply configs to the selected server =====
+  function applyConfig(name) {
+    const config = configs[name];
+    const server = getServer(selectedServerId);
+    clearError();
+
+    if (!config || config.auto) return;
+
+    if (!server) {
+      showError("Select a server before applying a config.");
+      return;
+    }
+
+    if (!modes[config.mode]) {
+      showError("This config does not have a valid mode.");
+      return;
+    }
+
+    // Add the config's mode if there is an empty slot.
+    // Never replace an existing mode without your choice.
+    if (!server.modes.includes(config.mode)) {
+      if (server.modes.length >= MAX_MODES_PER_SERVER) {
+        showError(
+          `${server.name} is full. Delete or replace a mode with ` +
+          `${modes[config.mode].label}, then apply this config again.`
+        );
+        return;
+      }
+
+      server.modes.push(config.mode);
+    }
+
+    refresh();
+    setMode(config.mode);
+
+    document.getElementById("configNote").textContent =
+      `${name} applied to ${server.name} · ${modes[config.mode].label}`;
+  }
+
+  function renderConfigButtons() {
+    const container = document.getElementById("configs");
+    container.replaceChildren();
+
+    Object.entries(configs).forEach(([name, config]) => {
+      if (config.auto) {
+        container.appendChild(
+          makeElement("span", "tag", `${name} · Automatic`)
+        );
+        return;
+      }
+
+      const button = makeElement("button", "", name);
+      button.type = "button";
+      button.addEventListener("click", () => applyConfig(name));
+      container.appendChild(button);
+    });
+
+    document.getElementById("configNote").textContent =
+      "Select a server first. Configs use that server's mode slots.";
+  }
+
+  // Update the example explanations to match selected-server behaviour.
+  configs["Jesus Config"].info =
+    "Example preset: activates Quiet mode on the selected server. " +
+    "Adds that mode only if there is an empty slot.";
+
+  configs["Cringy Config"].info =
+    "Example preset: activates Gen Z mode on the selected server. " +
+    "Adds that mode only if there is an empty slot.";
+
+  configs["ACMI Config"].info =
+    "Anti Care for My Image (ACMI). Example preset: activates " +
+    "Professional mode on the selected server. " +
+    "You can change this mapping in the configs data.";
+
+  configs["Tweek"].info =
+    `Automatic alert when an illustrative Intellect or Patience ` +
+    `score reaches ${TWEEK_THRESHOLD}. It does not switch servers ` +
+    `or change your active mode.`;
+
+  // ===== Prevent stale config messages after changes =====
+  const originalSelectServer = selectServer;
+  selectServer = function(id) {
+    document.getElementById("configNote").textContent =
+      "Choose a config for this server, or activate a mode directly.";
+    originalSelectServer(id);
+  };
+
+  const originalRefresh = refresh;
+  refresh = function() {
+    document.getElementById("configNote").textContent =
+      "Mode slots updated. Choose a mode or reapply a config.";
+    originalRefresh();
+  };
+
+  // ===== Rotating profile line =====
   let roleIndex = 0;
+
   function rotateRole() {
-    document.getElementById("role").textContent = roles[roleIndex];
+    document.getElementById("role").textContent =
+      roles[roleIndex] || "";
     roleIndex = (roleIndex + 1) % roles.length;
   }
 
-  // GitHub projects
+  // ===== GitHub projects =====
   let allRepos = [];
+  let reposLoaded = false;
 
   function renderRepos(filter = "") {
-    const box = document.getElementById("repos");
-    const q = filter.trim().toLowerCase();
-    const list = allRepos.filter(r =>
-      [r.name, r.description || "", r.language || ""].join(" ").toLowerCase().includes(q));
+    if (!reposLoaded) return;
 
-    box.innerHTML = "";
-    if (list.length === 0) {
-      box.innerHTML = `<p class="empty">No projects match your search.</p>`;
+    const container = document.getElementById("repos");
+    const query = filter.trim().toLowerCase();
+
+    const results = allRepos.filter(repo =>
+      [
+        repo.name,
+        repo.description || "",
+        repo.language || ""
+      ].join(" ").toLowerCase().includes(query)
+    );
+
+    container.replaceChildren();
+
+    if (!results.length) {
+      container.appendChild(
+        makeElement(
+          "p",
+          "empty",
+          allRepos.length
+            ? "No projects match your search."
+            : "No original public projects to display."
+        )
+      );
       return;
     }
-    list.forEach(r => {
-      const a = document.createElement("a");
-      a.className = "repo";
-      a.href = r.html_url;
-      a.target = "_blank";
-      a.rel = "noopener";
 
-      const name = document.createElement("div");
-      name.className = "repo-name";
-      name.textContent = r.name;
+    results.forEach(repo => {
+      const card = makeElement("a", "repo");
+      card.href = `https://github.com/${GITHUB_USER}/` +
+        encodeURIComponent(repo.name);
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
 
-      const desc = document.createElement("div");
-      desc.className = "repo-desc";
-      desc.textContent = r.description || "No description yet.";
+      const meta = makeElement("div", "repo-meta");
+      meta.append(
+        makeElement("span", "", repo.language || "Other"),
+        makeElement("span", "", `★ ${repo.stargazers_count || 0}`)
+      );
 
-      const meta = document.createElement("div");
-      meta.className = "repo-meta";
-      meta.innerHTML = `<span>${r.language || "Misc"}</span><span>★ ${r.stargazers_count}</span>`;
+      card.append(
+        makeElement("div", "repo-name", repo.name),
+        makeElement(
+          "div",
+          "repo-desc",
+          repo.description || "No description yet."
+        ),
+        meta
+      );
 
-      a.append(name, desc, meta);
-      box.appendChild(a);
+      container.appendChild(card);
     });
   }
 
   async function loadRepos() {
-    const box = document.getElementById("repos");
+    const container = document.getElementById("repos");
+
     try {
-      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=30`);
-      if (!res.ok) throw new Error(res.status);
-      const data = await res.json();
-      allRepos = data.filter(r => !r.fork);
-      renderRepos();
-    } catch (e) {
-      box.innerHTML = `<p class="empty">Could not load GitHub projects. Check your username and that your repos are public.</p>`;
+      const response = await fetch(
+        `https://api.github.com/users/` +
+        `${encodeURIComponent(GITHUB_USER)}/repos` +
+        `?sort=updated&per_page=100`
+      );
+
+      if (!response.ok) {
+        throw new Error(`GitHub returned ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error("Unexpected GitHub response.");
+      }
+
+      allRepos = data.filter(repo => !repo.fork);
+      reposLoaded = true;
+
+      renderRepos(document.getElementById("search").value);
+    } catch (error) {
+      container.replaceChildren(
+        makeElement(
+          "p",
+          "empty",
+          "GitHub projects are unavailable. Check your connection " +
+          "or try again later; GitHub may have limited API requests."
+        )
+      );
+      console.warn("GitHub project loading:", error.message);
     }
   }
 
-  // Start the page
-  document.getElementById("search").addEventListener("input", e => renderRepos(e.target.value));
-  document.getElementById("year").textContent = new Date().getFullYear();
-  setMode(localStorage.getItem("mode") || "gen-z");
+  // ===== Startup =====
+  loadState();
+
+  // Validate saved mode lists before rendering.
+  servers.forEach(server => {
+    const savedModes = Array.isArray(server.modes)
+      ? server.modes
+      : [];
+
+    server.modes = [...new Set(savedModes)]
+      .filter(key => Object.prototype.hasOwnProperty.call(modes, key))
+      .slice(0, MAX_MODES_PER_SERVER);
+  });
+
+  // Always start server-first rather than restoring a global mode.
+  selectedServerId = null;
+  document.body.className = "";
+  document.getElementById("quote").textContent =
+    "Choose a server. Then choose your mode.";
+
+  document.getElementById("add-btn").type = "button";
+  document.getElementById("add-btn")
+    .addEventListener("click", addMode);
+
+  document.getElementById("search").setAttribute(
+    "aria-label",
+    "Search GitHub projects"
+  );
+  document.getElementById("search")
+    .addEventListener("input", event => {
+      renderRepos(event.target.value);
+    });
+
+  document.getElementById("error").setAttribute("role", "status");
+  document.getElementById("year").textContent =
+    new Date().getFullYear();
+
   renderServers();
+  renderDetail();
+  renderConfigButtons();
   rotateRole();
-  setInterval(rotateRole, 2500);
+
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    setInterval(rotateRole, 3000);
+  }
+
   loadRepos();
 </script>
 </body>
 </html>
-
