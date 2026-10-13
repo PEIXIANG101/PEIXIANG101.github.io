@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ray Wong</title>
+<style>
+  :root { --accent:#2563EB; --bg:#0b1020; --card:#131a2e; --text:#e6e9f2; --muted:#8a93a8; }
+  body.gen-z        { --accent:#EC4899; --bg:#120a1f; --card:#1d1233; }
+  body.quiet        { --accent:#64748b; --bg:#0f1115; --card:#171a21; }
+  body.professional { --accent:#2563EB; --bg:#f1f5f9; --card:#ffffff; --text:#0f172a; --muted:#64748b; }
+  body.martial      { --accent:#DC2626; --bg:#0a0a0a; --card:#161616; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); transition: all .3s; min-height: 100vh; padding: 40px 20px; }
+  .wrap { max-width: 900px; margin: auto; display: grid; gap: 24px; }
+  .card { background: var(--card); border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,.06); }
+  h1 { font-size: 2.4rem; }
+  h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 14px; }
+  .muted { color: var(--muted); }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button { font: inherit; cursor: pointer; border-radius: 999px; padding: 8px 16px; border: 1px solid var(--accent); background: transparent; color: var(--text); transition: .2s; }
+  button:hover:not(:disabled) { background: var(--accent); color: #fff; }
+  button.active { background: var(--accent); color: #fff; }
+  .servers { display: grid; gap: 10px; }
+  .server { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,.04); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; background: #22c55e; }
+  .dot.off { background: #64748b; }
+  .lock { font-size: .75rem; color: var(--muted); }
+  .repos { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .repo a { color: var(--text); text-decoration: none; font-weight: 600; }
+  .repo p { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+  .quote { font-style: italic; color: var(--muted); margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="card">
+    <h1>Ray Wong</h1>
+    <p class="muted">Short bio goes here. One line about what you do.</p>
+    <p class="quote" id="quote"></p>
+  </header>
+
+  <section class="card">
+    <h2>Mode</h2>
+    <div class="btns" id="modes"></div>
+  </section>
+
+  <section class="card">
+    <h2>Configs</h2>
+    <div class="btns" id="configs"></div>
+  </section>
+
+  <section class="card">
+    <h2>Servers (one active at a time)</h2>
+    <div class="servers" id="servers"></div>
+  </section>
+
+  <section class="card">
+    <h2>GitHub Projects</h2>
+    <div class="repos" id="repos"><p class="muted">Loading...</p></div>
+  </section>
+
+</div>
+
+<script>
+  const GITHUB_USER = "PEIXIANG101";
+
+  // Default servers: always on, cannot be deactivated
+  // Optional servers: only one can be active at a time
+  const servers = [
+    { name: "Default Server A", locked: true },
+    { name: "Default Server B", locked: true },
+    { name: "Server 1", locked: false },
+    { name: "Server 2", locked: false },
+    { name: "Server 3", locked: false }
+  ];
+
+  const modes = {
+    "gen-z":        { label: "Gen Z",        quote: "No cap, this is the vibe." },
+    "quiet":        { label: "Quiet",        quote: "Speaks softly. Builds quietly." },
+    "professional": { label: "Professional", quote: "Focused on delivering results." },
+    "martial":      { label: "Martial",      quote: "Discipline. Focus. Execution." }
+  };
+
+  // Configs apply a mode and an optional active server
+  const configs = {
+    "Jesus Config":  { mode: "quiet",        server: "Server 1" },
+    "Cringy Config": { mode: "gen-z",        server: "Server 2" },
+    "ACMI Config":   { mode: "professional", server: "Server 3" }
+  };
+
+  let activeServer = null;
+
+  function setMode(key) {
+    document.body.className = key;
+    document.getElementById("quote").textContent = modes[key].quote;
+    document.querySelectorAll("#modes button").forEach(b =>
+      b.classList.toggle("active", b.dataset.mode === key));
+    localStorage.setItem("mode", key);
+  }
+
+  function setServer(name) {
+    const s = servers.find(x => x.name === name);
+    if (!s || s.locked) return;
+    activeServer = (activeServer === name) ? null : name; // click again to deactivate
+    renderServers();
+    localStorage.setItem("server", activeServer || "");
+  }
+
+  function renderServers() {
+    const box = document.getElementById("servers");
+    box.innerHTML = "";
+    servers.forEach(s => {
+      const on = s.locked || s.name === activeServer;
+      const row = document.createElement("div");
+      row.className = "server";
+      row.innerHTML = `<span><span class="dot ${on ? "" : "off"}"></span>${s.name}</span>`;
+      if (s.locked) {
+        row.insertAdjacentHTML("beforeend", `<span class="lock">Always on</span>`);
+      } else {
+        const btn = document.createElement("button");
+        btn.textContent = s.name === activeServer ? "Active" : "Activate";
+        btn.className = s.name === activeServer ? "active" : "";
+        btn.onclick = () => setServer(s.name);
+        row.appendChild(btn);
+      }
+      box.appendChild(row);
+    });
+  }
+
+  function applyConfig(name) {
+    const c = configs[name];
+    setMode(c.mode);
+    activeServer = c.server;
+    renderServers();
+  }
+
+  // Build mode buttons
+  const modesBox = document.getElementById("modes");
+  Object.entries(modes).forEach(([key, { label }]) => {
+    const btn = document.createElement("button");
+    btn.textContent = label;
+    btn.dataset.mode = key;
+    btn.onclick = () => setMode(key);
+    modesBox.appendChild(btn);
+  });
+
+  // Build config buttons
+  const configsBox = document.getElementById("configs");
+  Object.keys(configs).forEach(name => {
+    const btn = document.createElement("button");
+    btn.textContent = name;
+    btn.onclick = () => applyConfig(name);
+    configsBox.appendChild(btn);
+  });
+
+  // Load public GitHub repos (no token needed)
+  async function loadRepos() {
+    const box = document.getElementById("repos");
+    try {
+      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=6`);
+      if (!res.ok) throw new Error(res.status);
+      const repos = await res.json();
+      box.innerHTML = "";
+      repos.filter(r => !r.fork).forEach(r => {
+        const card = document.createElement("div");
+        card.className = "repo card";
+        card.innerHTML = `<a href="${r.html_url}" target="_blank" rel="noopener">${r.name}</a><p>${r.description || "No description yet."}</p>`;
+        box.appendChild(card);
+      });
+    } catch (e) {
+      box.innerHTML = `<p class="muted">Could not load GitHub repos. Check your username and that your repos are public.</p>`;
+    }
+  }
+
+  // Start the page
+  setMode(localStorage.getItem("mode") || "gen-z");
+  renderServers();
+  loadRepos();
+</script>
+</body>
+</html>
